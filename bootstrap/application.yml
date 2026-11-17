@@ -1,0 +1,28 @@
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: web-demo
+  namespace: argocd
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/Jordy-Aguilar/argocd-kubernetes-gitops.git
+    targetRevision: main
+    path: k8s
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gitops-demo
+  ignoreDifferences:
+    - group: apps
+      kind: Deployment
+      name: web-demo
+      namespace: gitops-demo
+      jsonPointers:
+        - /spec/replicas
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+      - CreateNamespace=true
+      - RespectIgnoreDifferences=true
